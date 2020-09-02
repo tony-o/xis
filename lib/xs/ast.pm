@@ -13,7 +13,9 @@ sub ast_print {
 #  printf "%s\n", ref $structure;
   my $build = '';
   if (ref $structure eq 'ARRAY') {
-    $build .= '(' . join(' ', (map { ast_print($_) } $structure->@*)) . ')';
+    $build .= '(' if ref $structure->[0] ne 'ARRAY';
+    $build .= join(' ', (map { ast_print($_) } $structure->@*));
+    $build .= ")" if ref $structure->[0] ne 'ARRAY';
   } else {
     $build .= $structure->{token};
   }
