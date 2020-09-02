@@ -23,23 +23,30 @@ sub scan {
         @src = @src[(length($&) - 1) ..@src - 1];
         $type = 'DECLARATION';
       }
-      when ($tok =~ m{^[a-zA-Z_]$}) {
-        join('', @src) =~ m{^[a-zA-Z_0-9\?\-]*};
-        $type = 'SYMBOL';
-        $tok  = $tok . $&;
-        @src  = @src[length($&) ..@src - 1];
-      }
-      when ($tok ge '0' && $tok le '9') {
-        if (join('', @src) =~ m{^\d+}) {
+      when ($tok ge '0' && $tok le '9' || (($tok eq '.' || $tok eq '-') && $src[0] ge '0' && $src[0] le '9')) {
+        if (join('', @src) =~ m{^\d+\.?\d*}) {
           $tok  = $tok . $&;
           @src  = @src[length($&) ..@src - 1];
         }
         $type = 'NUMBER';
       }
+      when ($tok =~ m{^[a-zA-Z_=><!\-\?0-9]$}) {
+        join('', @src) =~ m{^[a-zA-Z_=><!\-\?0-9]*};
+        $type = 'SYMBOL';
+        $tok  = $tok . $&;
+        @src  = @src[length($&) ..@src - 1];
+      }
       when ($tok eq '"' || $tok eq "'") {
-        join('', @src) =~ m{^.*(?<!\\)$tok}g;
-        $tok  = substr($&, 0, length($&) - 1);
-        @src  = @src[length($&) .. @src - 1];
+        my $m;
+        if ($tok eq '"') {
+          join('', @src) =~ m{^.*(?<!\\)"}g;
+          $m = $&;
+        } else {
+          join('', @src) =~  m{^.*(?<!\\)'}g;
+          $m = $&;
+        }
+        $tok  = substr($m, 0, length($m) - 1);
+        @src  = @src[length($m) .. @src - 1];
         $type = 'STRING';
       }
       when ($tok eq "\n") {
@@ -87,7 +94,7 @@ sub scan {
     }
   }
   push @tokens, { type => 'EOF', token => '', line => $line, pos => $pos };
-  wantarray ? @tokens : \@tokens;
+  @tokens;
 }
 
 69;

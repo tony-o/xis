@@ -8,6 +8,7 @@ our @EXPORT_OK = qw<eval_str eval_file>;
 
 use xs::scan qw<scan>;
 use xs::parse qw<parse>;
+use xs::runner qw<runner>;
 use xs::ast qw<ast_print>;
 
 use DDP;
@@ -15,9 +16,10 @@ use DDP;
 sub eval_str {
   my ($str) = @_;
 
-  my $x = parse(scan($str));
-  print ast_print($x), "\n";
-  $x;
+  my @scan = scan($str);
+  my @pars = [parse(\@scan)];
+  printf "%s\n", ast_print(\@pars);
+  runner(\@pars);
 }
 
 sub eval_file {

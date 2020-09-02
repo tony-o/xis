@@ -17,7 +17,9 @@ sub ast_print {
     $build .= join(' ', (map { ast_print($_) } $structure->@*));
     $build .= ")" if ref $structure->[0] ne 'ARRAY';
   } else {
+    $build .= '"' if $structure->{type} eq 'STRING';
     $build .= $structure->{token};
+    $build .= '"' if $structure->{type} eq 'STRING';
   }
   $build;
 }

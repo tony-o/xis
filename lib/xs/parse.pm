@@ -27,14 +27,14 @@ sub _eat {
 
 sub parse {
   shift if ref $_[0] eq 'xs::parse';
-  my ($tokens) = \@_;
+  my ($tokens) = @_;
   my $build    = '';
   my $idx      = 0;
   # lispy out
-  my ($tok, $nxt, @expr, @lpos, $spos, $i);
-  @expr   = [];
+  my ($tok, $nxt, $expr, @lpos, $spos, $i);
+  $expr   = [];
   @lpos   = 0;
-  my @ptr = $expr[0];
+  my $ptr = [$expr];
   $i = 0;
   $spos = $tokens->[0]->{pos}//-1;
   while ($idx < $tokens->@*) {
@@ -42,41 +42,41 @@ sub parse {
     $tok = $tokens->[$idx];
     #printf "I:%d LPOS:%s IDX:%d LINE:%d POS:%d TYPE:%s TOKEN:%s\n", ($i++), (join(',', @lpos)//'nil'), $idx, $tok->{line}, $tok->{pos}, $tok->{type}, ($tok->{type} eq 'NEWLINE' ? "<nl>" : $tok->{token});
     if ($tok->{type} eq 'DECLARATION') {
-      my $a = [$tok, []];
-      push @{$ptr[-1]}, $a;
-      push @ptr, $a->[1];
+      my $a = [{%$tok, type=>'CALL'}];
+      push @{$ptr->[-1]}, $a;
+      push @$ptr, $a;
       push @lpos, $spos;
     } elsif ($tok->{type} eq 'SYMBOL' || ($tok->{type} eq 'CONTROL' && $tok->{token} !~ m{^(,)$})) {
       $i = _eat($idx+1, qr{^(?!NEWLINE|SPACE)$}, $tokens);
       $nxt = $tokens->[$i];
       if ($nxt->{type} eq 'CONTROL' && $nxt->{token} eq ':') {
         push @lpos, $spos;
-        my $a = [$tok];
-        push @{$ptr[-1]}, $a;
-        push @ptr, $a;
+        my $a = [{%$tok, type=>'CALL'}];
+        push @{$ptr->[-1]}, $a;
+        push @$ptr, $a;
         $idx = $i + 1;
       } else {
-        push @{$ptr[-1]}, $tok;
+        push @{$ptr->[-1]}, $tok;
       }
-    } elsif ($tok->{type} eq 'NUMBER') {
-      push @{$ptr[-1]}, $tok;
+    } elsif ($tok->{type} eq 'NUMBER' || $tok->{type} eq 'STRING') {
+      push @{$ptr->[-1]}, $tok;
     } elsif ($tok->{type} eq 'NEWLINE') {
       $i = _eat($idx+1, qr{^(?!NEWLINE|SPACE)$}, $tokens);
       $nxt = $tokens->[$i];
       $spos = $nxt->{pos};
-      while ($nxt->{pos} < $lpos[-1] && @ptr > 1) {
+      while ($nxt->{pos} < $lpos[-1] && @$ptr > 1) {
         pop @lpos;
-        pop @ptr;
+        pop @$ptr;
       }
     } elsif ($tok->{type} eq 'CONTROL') {
       if ($tok->{token} eq ',') {
         pop @lpos;
-        pop @ptr;
+        pop @$ptr;
       }
     }
     $idx++;
   }
-  wantarray ? @expr : \@expr;
+  $expr;
 }
 
 69;
