@@ -72,6 +72,7 @@ sub parse {
       if ($tok->{token} eq ',') {
         pop @lpos;
         pop @$ptr;
+        die sprintf("errant comma? line(%d) pos(%d)", $tok->{line}, $tok->{pos}) if @$ptr == 0;
       }
     }
     $idx++;
