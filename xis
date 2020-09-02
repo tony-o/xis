@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+use lib 'lib';
+use xs;
+
+my $eval;
+GetOptions(
+  'eval=s' => \$eval,
+) or die sprintf('Unknown option: %s', $@);
+
+if (@ARGV && defined $eval) {
+  print("Run a file _or_ eval, not both.\n");
+  exit 255;
+}
+if (! @ARGV && ! defined $eval) {
+  print("Supply a file or -e.\n");
+  exit 255;
+}
+
+xs::eval_str($eval) if $eval;
+xs::eval_file($ARGV[0]) unless $eval;
