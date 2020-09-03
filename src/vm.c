@@ -1,0 +1,62 @@
+#include "vm.h"
+#include "debug.h"
+#include "val.h"
+#include <stdio.h>
+
+void vm_init(VM* vm){
+  vm_stack_reset(vm);
+}
+
+void vm_free(VM* vm){
+  
+}
+
+vm_result vm_interpret(VM* vm, opset* op){
+  vm->op = op;
+  vm->ip = vm->op->code;
+  return vm_run(vm);
+}
+
+vm_result vm_run(VM* vm){
+  #define READ() (*vm->ip++)
+  #define READC() (vm->op->constants.values[READ()])
+  for(;;){
+//    #ifdef DEBUG_TRACE_EXECUTION
+    printf("          ");
+    for (val* slot = vm->stack; slot < vm->stack_ptr; slot++) {
+      printf("[ ");
+      val_print(*slot);
+      printf(" ]");
+    }
+    printf("\n");
+    debug_op_disassemble_inst(vm->op, (int)(vm->ip - vm->op->code));
+//    #endif
+    uint8_t instr;
+    switch(instr = READ()){
+      case OP_RETURN:
+        printf("ret: ");
+        val_print(vm_stack_pop(vm));
+        printf("\n");
+        return VMR_OK;
+      case OP_CONSTANT: {
+        val v = READC();
+        vm_stack_push(vm, v);
+        break;
+      }
+    }
+  }
+  #undef READC
+  #undef READ
+}
+
+void vm_stack_reset(VM* vm){
+  vm->stack_ptr = vm->stack;
+}
+
+void vm_stack_push(VM* vm, val v){
+  *(vm->stack_ptr++) = v;
+}
+
+val vm_stack_pop(VM* vm){
+  return *(--vm->stack_ptr);
+}

@@ -1,0 +1,10 @@
+# list flattening with ref and by value
+
+def: x 1 2 3 # x = (1, 2, 3)
+def: y 9 8 7 # y = (9, 8, 7)
+
+def: z |x |y # z = (1, 2, 3, 9, 8, 7)
+def: z x y   # z = ((1, 2, 3), (9, 8, 7)
+
+def: z @x @y   # z = (\x[0 .. 2], \y[0 .. 2])
+def: z |@x |@y # z = (\x[0], \x[1], \x[2], \y[0], \y[1], \y[2])

@@ -1,0 +1,15 @@
+# macros
+    
+macro: iff c t e
+  cond: !c:   !t,
+        else: !e
+
+fun: never-x x
+  never-x: x
+
+printf: "%d" if: =: 1 0,
+  1
+  never-x: 0
+
+newline:
+
