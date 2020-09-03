@@ -23,6 +23,8 @@ int debug_op_disassemble_inst(opset* op, int offset){
       return debug_simple_instr("OP_RETURN", offset);
     case OP_CONSTANT:
       return debug_const_instr("OP_CONSTANT", op, offset);
+    case OP_CALL:
+      return debug_const_instr("OP_CALL", op, offset);
     default:
       printf("Unknown opcode %d\n", instr);
       return offset + 1;

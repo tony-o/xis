@@ -1,12 +1,12 @@
 CC=gcc
-CFLAGS=-Isrc -Wall
+CFLAGS=-Isrc -Wall -g
 
 TARGET=xis
 EXTRA=src/memory.c src/set.c src/debug.c src/val.c src/vm.c
 all: $(TARGET)
 
 $(TARGET): $(TARGET).c
-	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).c $(EXTRA) 
+	$(CC) $(CFLAGS) -o bin/$(TARGET) $(TARGET).c $(EXTRA) 
 
 clean:
 	$(RM) $(TARGET)

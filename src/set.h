@@ -10,6 +10,7 @@
 typedef enum {
   OP_RETURN,
   OP_CONSTANT,
+  OP_CALL,
 } opset_enum;
 
 typedef struct {
