@@ -8,7 +8,7 @@
 typedef struct {
   token current, previous;
   int had_error, panic;
-  opset op;
+  opset* op;
 } parser;
 
 int compile(VM*, const char*, opset*);

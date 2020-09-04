@@ -50,6 +50,7 @@ static void repl(){
     }
     if(line[0] == '\\'){
       q = line[1] == 'q' ? 0 : 1;
+      break;
     }
     line[strlen(line)-1] = '\0';
     vm_interpret(&vm, line);

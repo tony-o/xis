@@ -15,26 +15,13 @@ int compile(VM* vm, const char* src, opset* o){
 
   parser p;
   p.had_error = p.panic = 0;
-  p.op = *o;
+  p.op = o;
 
   compiler_advance(&p, &sc);
   compiler_expression(vm, &p, &sc);
   compiler_consume(&p, &sc, TOKEN_EOF, "Expected end of expression.");
   compiler_end(vm, &p);
-//  for(;;){
-//    token t = scanner_token(&sc);
-//    if(t.line != line){
-//      printf("%4d ", t.line);
-//      line = t.line;
-//    } else {
-//      printf("   | ");
-//    }
-//    printf("%-13s '%.*s'\n", tt_names[t.type], t.length, t.start);
-//
-//    if(t.type == TOKEN_EOF){
-//      break;
-//    }
-//  }
+
   return !p.had_error;
 }
 
@@ -44,13 +31,17 @@ void compiler_end(VM* vm, parser* p){
 
 void compiler_expression(VM* vm, parser* p, scanner* sc){
   switch(p->current.type){
-    case(OP_CONSTANT):
+    case(TOKEN_DOUBLE):
+    case(TOKEN_LITERAL):
       compiler_emit(vm, p, OP_CONSTANT);
       break;
+    case(TOKEN_EOF):
+      return;
     default:
       compiler_error_at(p, "unexpected token.");
       break;
   }
+  compiler_advance(p, sc);
 }
 
 void compiler_advance(parser* p, scanner* sc){
@@ -62,19 +53,17 @@ void compiler_advance(parser* p, scanner* sc){
     }
     compiler_error_at(p, p->current.start);
   }
-  token t = p->current;;
-  if(t.line){
-    printf("%4d ", t.line);
-  }
-  printf("%-13s '%.*s'\n", tt_names[t.type], t.length, t.start);
 }
 
 void compiler_emit(VM* vm, parser* p, uint8_t b){
   op_write(compiler_current_op(p), b, p->previous.line);
+  if(b == OP_CONSTANT){
+    op_write(compiler_current_op(p), op_add_const(compiler_current_op(p), 5.0), p->previous.line);
+  }
 }
 
 opset* compiler_current_op(parser* p){
-  return &(p->op);
+  return p->op;
 }
 
 void compiler_consume(parser* p, scanner* sc, token_type t, const char* msg){

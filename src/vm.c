@@ -21,6 +21,10 @@ vm_result vm_interpret(VM* vm, const char* src){
     op_free(&o);
     return VMR_COMPILE_ERR;
   }
+
+  vm->op = &o;
+  vm->ip = vm->op->code;
+
   vm_result r = vm_run(vm);
 
   op_free(&o);
@@ -30,6 +34,7 @@ vm_result vm_interpret(VM* vm, const char* src){
 vm_result vm_run(VM* vm){
   #define READ() (*vm->ip++)
   #define READC() (vm->op->constants.values[READ()])
+  //debug_op_disassemble(vm->op, "test");
   for(;;){
 //    #ifdef DEBUG_TRACE_EXECUTION
     printf("          ");
