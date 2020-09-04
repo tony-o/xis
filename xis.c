@@ -1,24 +1,93 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "xis.h"
 
+#define VERSION 0
+
+static void repl();
+static void run_file(const char*);
+
 int main(int argc, const char* argv[]) {
+  if(argc == 1){
+    repl();
+  } else if (argc == 2) {
+    run_file(argv[1]);
+  } else {
+    printf("Usage: xis <file>\n");
+    printf("   or: xis\n");
+    exit(255);
+  }
+  return 0;
+}
+
+static void repl(){
   VM vm;
   vm_init(&vm);
-  opset o;
-  op_init(&o);
-  for(val i=1;i<4;i++){
-    op_write(&o, OP_CONSTANT, 1);
-    op_write(&o, op_add_const(&o, i), 1);
+
+  char line[1024];
+
+  printf(" ██▀███   ▄▄▄       ▄████▄   ▄████▄   ▒█████   ▒█████   ███▄    █\n");
+  printf("▓██ ▒ ██▒▒████▄    ▒██▀ ▀█  ▒██▀ ▀█  ▒██▒  ██▒▒██▒  ██▒ ██ ▀█   █\n");
+  printf("▓██ ░▄█ ▒▒██  ▀█▄  ▒▓█    ▄ ▒▓█    ▄ ▒██░  ██▒▒██░  ██▒▓██  ▀█ ██▒\n");
+  printf("▒██▀▀█▄  ░██▄▄▄▄██ ▒▓▓▄ ▄██▒▒▓▓▄ ▄██▒▒██   ██░▒██   ██░▓██▒  ▐▌██▒\n");
+  printf("░██▓ ▒██▒ ▓█   ▓██▒▒ ▓███▀ ░▒ ▓███▀ ░░ ████▓▒░░ ████▓▒░▒██░   ▓██░\n");
+  printf("░ ▒▓ ░▒▓░ ▒▒   ▓▒█░░ ░▒ ▒  ░░ ░▒ ▒  ░░ ▒░▒░▒░ ░ ▒░▒░▒░ ░ ▒░   ▒ ▒\n");
+  printf("  ░▒ ░ ▒░  ▒   ▒▒ ░  ░  ▒     ░  ▒     ░ ▒ ▒░   ░ ▒ ▒░ ░ ░░   ░ ▒░\n");
+  printf("  ░░   ░   ░   ▒   ░        ░        ░ ░ ░ ▒  ░ ░ ░ ▒     ░   ░ ░\n");
+  printf("   ░           ░  ░░ ░      ░ ░          ░ ░      ░ ░           ░\n");
+  printf("                   ░        ░\n");
+
+
+
+  printf("\nstarting repl for xis version %d\n\n", VERSION);
+  int q = 1;
+  for(;q;){
+    printf("o> ");
+    if(!fgets(line, sizeof(line), stdin)){
+      printf("\n");
+      break;
+    }
+    if(line[0] == '\\'){
+      q = line[1] == 'q' ? 0 : 1;
+    }
+    line[strlen(line)-1] = '\0';
+    vm_interpret(&vm, line);
   }
-  op_write(&o, OP_CALL, 2);
-  op_write(&o, op_add_const(&o, 3), 2);
-
-  op_write(&o, OP_RETURN, 2);
-
-  debug_op_disassemble(&o, "test");
-  printf("==output==\n\n");
-  vm_interpret(&vm, &o);
+  printf("cleaning up...\n");
   vm_free(&vm);
-  op_free(&o);
-  return 0;
+  printf("l8r skater!\n");
+}
+
+static void run_file(const char* path){
+  FILE* f = fopen(path, "rb");
+  if(f == NULL){
+    fprintf(stderr, "Unable to open file: %s\n", path);
+    exit(1);
+  }
+  fseek(f, 0L, SEEK_END);
+  size_t fs = ftell(f);
+  rewind(f);
+
+  char* buffer = (char*)malloc(fs+1);
+  if(buffer == NULL){
+    fprintf(stderr, "Not enough memory to read: %s\n", path);
+    fclose(f);
+    exit(1);
+  }
+  size_t br = fread(buffer, sizeof(char), fs, f);
+  if(br < fs){
+    fprintf(stderr, "Failed to read file: %s\n", path);
+    fclose(f);
+    exit(1);
+  }
+  buffer[br] = '\0';
+  fclose(f);
+
+  VM vm;
+  vm_init(&vm);
+
+  vm_interpret(&vm, buffer);
+
+  vm_free(&vm);
 }

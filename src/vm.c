@@ -1,6 +1,8 @@
 #include "vm.h"
 #include "debug.h"
 #include "val.h"
+#include "compiler.h"
+#include "set.h"
 #include <stdio.h>
 
 void vm_init(VM* vm){
@@ -11,10 +13,18 @@ void vm_free(VM* vm){
   
 }
 
-vm_result vm_interpret(VM* vm, opset* op){
-  vm->op = op;
-  vm->ip = vm->op->code;
-  return vm_run(vm);
+vm_result vm_interpret(VM* vm, const char* src){
+  opset o;
+  op_init(&o);
+
+  if(!compile(vm, src, &o)){
+    op_free(&o);
+    return VMR_COMPILE_ERR;
+  }
+  vm_result r = vm_run(vm);
+
+  op_free(&o);
+  return r;
 }
 
 vm_result vm_run(VM* vm){

@@ -21,7 +21,7 @@ typedef enum {
 void vm_init(VM*);
 void vm_free(VM*);
 
-vm_result vm_interpret(VM*, opset*);
+vm_result vm_interpret(VM*, const char*);
 
 vm_result vm_run(VM*);
 void vm_stack_reset(VM*);
