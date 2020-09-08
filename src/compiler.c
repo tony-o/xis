@@ -82,7 +82,7 @@ void compiler_error_at(parser* p, const char* msg){
   }
   p->panic = 1;
 
-  token t = p->previous;
+  token t = p->current;
   fprintf(stderr, "[line %d] error: ", t.line);
   if(t.type == TOKEN_EOF){
     fprintf(stderr, "unexpected eof.");

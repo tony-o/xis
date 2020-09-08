@@ -16,6 +16,7 @@ token scanner_token(scanner* sc){
     return scanner_make_token(sc, TOKEN_EOF);
   }
 
+  printf("let's try again!\n");
   char c = scanner_advance(sc);
   switch(c){
     case ':': return scanner_make_token(sc, TOKEN_CALL);
@@ -56,21 +57,23 @@ token scanner_consume_string(scanner* sc, char e){
 }
 
 token scanner_consume_sym(scanner* sc){
-  char c = *(sc->current);
-  while(scanner_is_sym(sc)){
+  printf("START\n");
+  while(scanner_is_sym(sc) && !scanner_eof(sc)){
     scanner_advance(sc);
-    c = *(sc->current);
+    printf("ADVANCING\n");
   }
+  printf("DON\n");
   char* a = malloc(sizeof(char) * ((int)(sc->current-sc->start) + 1));
   char* b;
   sprintf(a, "%.*s", (int)(sc->current - sc->start), sc->start);
   strtod(a, &b);
   if(a == b){
     free(a);
+    printf("it's a symbol!\n");
     return scanner_make_token(sc, TOKEN_SYMBOL);
   }
   free(a);
-
+  printf("it's a girl!\n");
   return scanner_make_token(sc, TOKEN_DOUBLE);
 
 }
@@ -98,7 +101,7 @@ char scanner_advance(scanner* sc){
 }
 
 int scanner_eof(scanner* sc){
-  return sc->current == '\0';
+  return *sc->current == '\0';
 }
 
 token scanner_make_token(scanner* sc, token_type tt){
