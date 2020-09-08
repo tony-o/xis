@@ -53,19 +53,14 @@ vm_result vm_run(VM* vm){
         val_print(vm_stack_pop(vm));
         printf("\n");
         return VMR_OK;
-      case OP_CONSTANT: {
+      case OP_STRING:
+      case OP_NUMBER: {
         val v = READC();
         vm_stack_push(vm, v);
         break;
       }
       case OP_CALL: {
-        val v = READC(); // # of args to for caller
-        val x = 0;
-        while (v > 0) {
-          x += vm_stack_pop(vm);
-          v--;
-        }
-        vm_stack_push(vm, x);
+        //val v = READC(); // # of args to for caller
         break;
       }
     }

@@ -107,6 +107,17 @@ token scanner_make_token(scanner* sc, token_type tt){
   t.start = sc->start;
   t.line = sc->line;
   t.length = (int)(sc->current - sc->start);
+  if (tt == TOKEN_DOUBLE){
+    char* a = malloc(sizeof(char) * (t.length + 1));
+    char* b;
+    sprintf(a, "%.*s", t.length, sc->start);
+    t.v = NUMVAL(strtod(a, &b));
+    free(a);
+  } else if (tt == TOKEN_LITERAL){
+    char* a = malloc(sizeof(char) * (t.length + 1));
+    sprintf(a, "%.*s", t.length, sc->start);
+    t.v = STRVAL(a);
+  }
   return t;
 }
 

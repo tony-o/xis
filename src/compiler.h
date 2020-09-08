@@ -17,6 +17,7 @@ void compiler_consume(parser*, scanner*, token_type, const char*);
 opset* compiler_current_op(parser*);
 void compiler_error_at(parser*, const char*);
 void compiler_emit(VM*, parser*, uint8_t);
+void compiler_emit_val(VM*, parser*, uint8_t, val);
 void compiler_expression(VM*, parser*, scanner*);
 void compiler_end(VM*, parser*);
 

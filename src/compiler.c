@@ -33,7 +33,7 @@ void compiler_expression(VM* vm, parser* p, scanner* sc){
   switch(p->current.type){
     case(TOKEN_DOUBLE):
     case(TOKEN_LITERAL):
-      compiler_emit(vm, p, OP_CONSTANT);
+      compiler_emit_val(vm, p, OP_STRING, p->current.v);
       break;
     case(TOKEN_EOF):
       return;
@@ -57,9 +57,11 @@ void compiler_advance(parser* p, scanner* sc){
 
 void compiler_emit(VM* vm, parser* p, uint8_t b){
   op_write(compiler_current_op(p), b, p->previous.line);
-  if(b == OP_CONSTANT){
-    op_write(compiler_current_op(p), op_add_const(compiler_current_op(p), 5.0), p->previous.line);
-  }
+}
+
+void compiler_emit_val(VM* vm, parser* p, uint8_t b, val v){
+  compiler_emit(vm, p, b);
+  op_write(compiler_current_op(p), op_add_const(compiler_current_op(p), v), p->previous.line);
 }
 
 opset* compiler_current_op(parser* p){

@@ -1,6 +1,8 @@
 #ifndef xis_scanner_h_
 #define xis_scanner_h_
 
+#include "val.h"
+
 typedef struct {
   const char* start;
   const char* current;
@@ -16,6 +18,7 @@ typedef struct {
   const char* start;
   int length;
   int line;
+  val v;
 } token;
 
 void scanner_init(scanner*, const char*);

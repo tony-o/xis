@@ -21,7 +21,8 @@ int debug_op_disassemble_inst(opset* op, int offset){
   switch(instr){
     case OP_RETURN:
       return debug_simple_instr("OP_RETURN", offset);
-    case OP_CONSTANT:
+    case OP_NUMBER:
+    case OP_STRING:
       return debug_const_instr("OP_CONSTANT", op, offset);
     case OP_CALL:
       return debug_const_instr("OP_CALL", op, offset);

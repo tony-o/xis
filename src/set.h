@@ -9,7 +9,8 @@
 
 typedef enum {
   OP_RETURN,
-  OP_CONSTANT,
+  OP_NUMBER,
+  OP_STRING,
   OP_CALL,
 } opset_enum;
 
