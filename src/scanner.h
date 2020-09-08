@@ -27,6 +27,7 @@ char scanner_advance(scanner*);
 void scanner_skipws(scanner*);
 
 int scanner_eof(scanner*);
+int char_is_sym(char);
 int scanner_is_sym(scanner*);
 token scanner_make_token(scanner*, token_type);
 token scanner_error(scanner*, const char*);
